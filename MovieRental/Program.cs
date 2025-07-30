@@ -2,34 +2,57 @@ using MovieRental.Data;
 using MovieRental.Movie;
 using MovieRental.Rental;
 using MovieRental.Customer;
+using MovieRental.Middleware;
+using NLog.Web;
 
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddEntityFrameworkSqlite().AddDbContext<MovieRentalDbContext>();
-
-builder.Services.AddScoped<IRentalFeatures, RentalFeatures>();
-builder.Services.AddScoped<ICustomerFeatures, CustomerFeatures>();
-
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
+var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
+try
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var builder = WebApplication.CreateBuilder(args);
+
+    
+    builder.Logging.ClearProviders();
+    builder.Host.UseNLog();
+
+    builder.Services.AddControllers();
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
+    builder.Services.AddEntityFrameworkSqlite().AddDbContext<MovieRentalDbContext>();
+
+    builder.Services.AddScoped<IRentalFeatures, RentalFeatures>();
+    builder.Services.AddScoped<ICustomerFeatures, CustomerFeatures>();
+
+    var app = builder.Build();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseHttpsRedirection();
+
+  
+    app.UseMiddleware<GlobalExceptionHandler>();
+
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<MovieRentalDbContext>();
+        dbContext.Database.EnsureCreated();
+    }
+
+    app.Run();
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-using (var client = new MovieRentalDbContext())
+catch (Exception ex)
 {
-	client.Database.EnsureCreated();
+    logger.Error(ex, "Stopped program because of exception");
+    throw;
 }
-
-app.Run();
+finally
+{
+    NLog.LogManager.Shutdown();
+}

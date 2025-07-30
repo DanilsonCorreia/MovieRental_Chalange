@@ -33,7 +33,10 @@ Can you help us fix some issues and implement missing features?
  
  * No exceptions are being caught in this api, how would you deal with these exceptions?
  
- 
+    For error and exception handling i implemented a midleware to handle the http request and responses to check if everything works well behaind the midleware.
+    After that i implement try catch blocks to catch all exceprions in the api and use a logger to show them to the user to be more clear what goes wrong with this api.
+    I has implemented as well some simple custom exception to give the user more details about the exception origin.
+    Also add the NLog package to save all error logs that are throwing by the api on a file.
 
 
 	## Challenge (Nice to have)

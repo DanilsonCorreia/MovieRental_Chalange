@@ -7,24 +7,41 @@ namespace MovieRental.Controllers
     [Route("[controller]")]
     public class MovieController : ControllerBase
     {
-
         private readonly IMovieFeatures _features;
+        private readonly ILogger<MovieController> _logger;
 
-        public MovieController(IMovieFeatures features)
+        public MovieController(IMovieFeatures features, ILogger<MovieController> logger)
         {
             _features = features;
+            _logger = logger;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-	        return Ok(_features.GetAll());
+            try
+            {
+                return Ok(_features.GetAll());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception(ex.Message);
+            }
         }
 
         [HttpPost]
         public IActionResult Post([FromBody] Movie.Movie movie)
         {
-	        return Ok(_features.Save(movie));
+            try
+            {
+                return Ok(_features.Save(movie));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception(ex.Message);
+            }
         }
     }
 }
