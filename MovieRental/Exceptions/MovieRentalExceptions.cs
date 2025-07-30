@@ -17,7 +17,13 @@ namespace MovieRental.Exceptions
 		public DuplicateEntityException(string message) : base(message) { }
 	}
 
-	public class DatabaseOperationException : Exception
+    public class PaymentProcessingException : Exception
+    {
+        public PaymentProcessingException(string message) : base(message) { }
+    }
+
+
+    public class DatabaseOperationException : Exception
 	{
 		public DatabaseOperationException(string message) : base(message) { }
 		public DatabaseOperationException(string message, Exception innerException) 

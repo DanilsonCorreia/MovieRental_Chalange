@@ -4,13 +4,15 @@ using MovieRental.Rental;
 using MovieRental.Customer;
 using MovieRental.Middleware;
 using NLog.Web;
+using MovieRental.PaymentProviders;
+using MovieRental.Payment;
 
 var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
 try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    
+
     builder.Logging.ClearProviders();
     builder.Host.UseNLog();
 
@@ -21,6 +23,8 @@ try
 
     builder.Services.AddScoped<IRentalFeatures, RentalFeatures>();
     builder.Services.AddScoped<ICustomerFeatures, CustomerFeatures>();
+    builder.Services.AddScoped<IPaymentProviderFactory, PaymentProviderFactory>();
+    builder.Services.AddScoped<IPaymentFeature, PaymentFeature>();
 
     var app = builder.Build();
 
@@ -32,7 +36,7 @@ try
 
     app.UseHttpsRedirection();
 
-  
+
     app.UseMiddleware<GlobalExceptionHandler>();
 
     app.UseAuthorization();

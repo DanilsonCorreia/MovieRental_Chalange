@@ -1,11 +1,15 @@
 ﻿namespace MovieRental.PaymentProviders
 {
-    public class MbWayProvider
+    public class MbWayProvider : IPaymentProvider
     {
-        public Task<bool> Pay(double price)
+        public string ProviderName => "MbWay";
+
+        public async Task<bool> ProcessPaymentAsync(double amount)
         {
-            //ignore this implementation
-            return Task.FromResult<bool>(true);
+            
+            await Task.Delay(150);
+
+            return true;
         }
     }
 }

@@ -46,11 +46,26 @@ Here are the specific instructions for this implementation:
 
 * Payment Provider Classes:
     * In the "PaymentProvider" folder, you will find two classes that contain basic (dummy) implementations of payment providers. These can be used as a starting point for your work.
+    
+    Keep it simple just returning true as payment sucessed.
+
 * RentalFeatures Class:
     * Within the RentalFeatures class, you are required to implement the payment processing functionality.
+
+    Payment processing implemented on RentaFeature with support of new created PaymentFeature class to manage payments.
+    As well i created a new entity for payment to store payment infos on Db.
+
 * Payment Provider Designation:
     * The specific payment provider to be used in a rental is specified in the Rental model under the attribute named "PaymentMethod".
+
+    The provider that should be use is geted via the retal model PaymentMethod and is created a service provider with the provider type.
+
 * Extensibility:
     * The system should be designed to allow the addition of more payment providers in the future, ensuring flexibility and scalability.
+
+    Created a PaymentProviderFactory class that has the dictionary of all payment method and the respective class type that should be created base on the name of the payment method.
+    It implememts the .NET ServiceProvider interface that create a new instance of the provider type so helping the api to be scalable regarding the paymentproviders that ypu want to insert in future.
 * Payment Failure Handling:
     * If the payment method fails during the transaction, the system should prevent the creation of the rental record. In such cases, no rental should be saved to the database.
+
+    All check is done before saving the rental on the DB so the rental only will be create if the payment succeded.

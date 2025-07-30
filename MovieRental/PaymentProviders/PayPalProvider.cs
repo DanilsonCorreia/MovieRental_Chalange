@@ -1,11 +1,17 @@
 ﻿namespace MovieRental.PaymentProviders
 {
-    public class PayPalProvider
+    public class PayPalProvider : IPaymentProvider
     {
-        public Task<bool> Pay(double price)
+        public string ProviderName => "PayPal";
+
+        public async Task<bool> ProcessPaymentAsync(double amount)
         {
-            //ignore this implementation
-            return Task.FromResult<bool>(true);
+            // Simulate PayPal payment processing
+            await Task.Delay(100); // Simulate network delay
+            
+            // For demo purposes, let's say PayPal always succeeds
+            // In a real implementation, this would call PayPal's API
+            return true;
         }
     }
 }
