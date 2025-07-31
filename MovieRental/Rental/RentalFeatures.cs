@@ -52,22 +52,33 @@ namespace MovieRental.Rental
 
 				// Payment successful, save the rental
 				_movieRentalDb.Rentals.Add(rental);
-				await _movieRentalDb.SaveChangesAsync();
-				
-				// Link the successful payment to the rental
-				var payment = await _movieRentalDb.Payments
-					.Where(p => p.CustomerId == rental.CustomerId && 
-							   p.PaymentMethod == rental.PaymentMethod && 
-							   p.IsSuccessful == true)
-					.OrderByDescending(p => p.CreatedAt)
-					.FirstOrDefaultAsync();
-				
-				if (payment != null)
-				{
-					payment.RentalId = rental.Id;
-					await _movieRentalDb.SaveChangesAsync();
-				}
-				
+                var rentalSaved = await _movieRentalDb.SaveChangesAsync();
+
+                if (rentalSaved != 0 && paymentSuccessful)
+                {
+                    // Only save payment record if payment is successful
+                    var paymentEntity = new Payment.Payment
+                    {
+                        RentalId = rental.Id,
+                        PaymentMethod = rental.PaymentMethod,
+                        Amount = (decimal)price,
+                        CustomerId = rental.CustomerId,
+                        IsSuccessful = true,
+                        Status = "Success",
+                        CreatedAt = DateTime.UtcNow,
+                        ProcessedAt = DateTime.UtcNow,
+                        TransactionId = Guid.NewGuid().ToString(),
+                        ProviderResponse = "Payment processed successfully"
+                    };
+
+                    await _paymentFeature.SaveAsync(paymentEntity);
+                    _logger.LogInformation($"Payment successful for rental {rental.Id}");
+                }
+                else
+                {
+                    _logger.LogWarning($"Payment failed for rental {rental.Id} using {rental.PaymentMethod}");
+                }
+
 				_logger.LogInformation($"Rental saved successfully with ID {rental.Id}" );
 				return rental;
 			}
@@ -89,11 +100,14 @@ namespace MovieRental.Rental
 			{
 				if (string.IsNullOrWhiteSpace(customerName))
 					throw new ArgumentException("Customer name cannot be empty.");
+				
+				var customer = await _movieRentalDb.Customers.Where(r => r.Name == customerName).FirstOrDefaultAsync();
 
-				return await _movieRentalDb.Rentals
-					.Where(r => r.Customer.Name == customerName)
-					.Include(r => r.Movie)
-					.Include(r => r.Customer)
+				if (customer == null)
+					throw new EntityNotFoundException($"Customer with the name {customerName} don´t exist!!!");
+
+                return await _movieRentalDb.Rentals
+					.Where(r => r.CustomerId == customer.Id)
 					.ToListAsync();
 			}
 			catch (Exception ex)
@@ -112,30 +126,6 @@ namespace MovieRental.Rental
 
 				var paymentProvider = _paymentProviderFactory.GetPaymentProvider(rental.PaymentMethod);
 				var paymentResult = await paymentProvider.ProcessPaymentAsync(price);
-
-				if (paymentResult)
-				{
-					// Only save payment record if payment is successful
-					var payment = new Payment.Payment
-					{
-						PaymentMethod = rental.PaymentMethod,
-						Amount = (decimal)price,
-						CustomerId = rental.CustomerId,
-						IsSuccessful = true,
-						Status = "Success",
-						CreatedAt = DateTime.UtcNow,
-						ProcessedAt = DateTime.UtcNow,
-						TransactionId = Guid.NewGuid().ToString(), 
-						ProviderResponse = "Payment processed successfully"
-					};
-
-					await _paymentFeature.SaveAsync(payment);
-					_logger.LogInformation($"Payment successful for rental {rental.Id}");
-				}
-				else
-				{
-					_logger.LogWarning($"Payment failed for rental {rental.Id} using {rental.PaymentMethod}");
-				}
 
 				return paymentResult;
 			}

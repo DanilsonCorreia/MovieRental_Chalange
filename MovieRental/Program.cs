@@ -25,6 +25,7 @@ try
     builder.Services.AddScoped<ICustomerFeatures, CustomerFeatures>();
     builder.Services.AddScoped<IPaymentProviderFactory, PaymentProviderFactory>();
     builder.Services.AddScoped<IPaymentFeature, PaymentFeature>();
+    builder.Services.AddScoped<IMovieFeatures, MovieFeatures>();
 
     var app = builder.Build();
 

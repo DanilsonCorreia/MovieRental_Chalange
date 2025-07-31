@@ -50,5 +50,30 @@ namespace MovieRental.Controllers
                 throw new Exception(ex.Message);
             }
         }
+
+        [HttpGet("customer/{customerName}")]
+        public async Task<IActionResult> GetByCustomerName(string customerName)
+        {
+            try
+            {
+                var rentals = await _features.GetRentalsByCustomerNameAsync(customerName);
+                return Ok(rentals);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning("Invalid customer name: {CustomerName}", customerName);
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (DatabaseOperationException ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve rentals for customer {CustomerName}", customerName);
+                return StatusCode(500, new { Message = "Failed to retrieve rentals. Please try again." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

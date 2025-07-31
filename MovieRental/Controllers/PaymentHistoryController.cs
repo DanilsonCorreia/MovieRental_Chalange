@@ -8,12 +8,12 @@ namespace MovieRental.Controllers
     [Route("[controller]")]
     public class PaymentHistoryController : ControllerBase
     {
-        private readonly IPaymentFeature _paymentRepository;
+        private readonly IPaymentFeature _paymentFeature;
         private readonly ILogger<PaymentHistoryController> _logger;
 
-        public PaymentHistoryController(IPaymentFeature paymentRepository, ILogger<PaymentHistoryController> logger)
+        public PaymentHistoryController(IPaymentFeature paymentFeature, ILogger<PaymentHistoryController> logger)
         {
-            _paymentRepository = paymentRepository;
+            _paymentFeature = paymentFeature;
             _logger = logger;
         }
 
@@ -22,7 +22,7 @@ namespace MovieRental.Controllers
         {
             try
             {
-                var payments = await _paymentRepository.GetAllAsync();
+                var payments = await _paymentFeature.GetAllAsync();
                 return Ok(payments);
             }
             catch (DatabaseOperationException ex)
@@ -42,7 +42,7 @@ namespace MovieRental.Controllers
         {
             try
             {
-                var payment = await _paymentRepository.GetByIdAsync(id);
+                var payment = await _paymentFeature.GetByIdAsync(id);
                 if (payment == null)
                     return NotFound(new { Message = $"Payment with ID {id} was not found." });
                 
@@ -70,7 +70,7 @@ namespace MovieRental.Controllers
         {
             try
             {
-                var payments = await _paymentRepository.GetByCustomerIdAsync(customerId);
+                var payments = await _paymentFeature.GetByCustomerIdAsync(customerId);
                 return Ok(payments);
             }
             catch (ArgumentException ex)
@@ -95,7 +95,7 @@ namespace MovieRental.Controllers
         {
             try
             {
-                var payments = await _paymentRepository.GetByRentalIdAsync(rentalId);
+                var payments = await _paymentFeature.GetByRentalIdAsync(rentalId);
                 return Ok(payments);
             }
             catch (ArgumentException ex)
@@ -120,7 +120,7 @@ namespace MovieRental.Controllers
         {
             try
             {
-                var payments = await _paymentRepository.GetSuccessfulPaymentsAsync();
+                var payments = await _paymentFeature.GetSuccessfulPaymentsAsync();
                 return Ok(payments);
             }
             catch (DatabaseOperationException ex)
@@ -140,7 +140,7 @@ namespace MovieRental.Controllers
         {
             try
             {
-                var payments = await _paymentRepository.GetFailedPaymentsAsync();
+                var payments = await _paymentFeature.GetFailedPaymentsAsync();
                 return Ok(payments);
             }
             catch (DatabaseOperationException ex)

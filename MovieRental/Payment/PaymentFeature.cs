@@ -48,8 +48,6 @@ namespace MovieRental.Payment
                     throw new ArgumentException("Payment ID must be greater than 0.");
 
                 return await _movieRentalDb.Payments
-                    .Include(p => p.Customer)
-                    .Include(p => p.Rental)
                     .FirstOrDefaultAsync(p => p.Id == id);
             }
             catch (Exception ex)
@@ -68,8 +66,6 @@ namespace MovieRental.Payment
 
                 return await _movieRentalDb.Payments
                     .Where(p => p.CustomerId == customerId)
-                    .Include(p => p.Customer)
-                    .Include(p => p.Rental)
                     .OrderByDescending(p => p.CreatedAt)
                     .ToListAsync();
             }
@@ -89,8 +85,6 @@ namespace MovieRental.Payment
 
                 return await _movieRentalDb.Payments
                     .Where(p => p.RentalId == rentalId)
-                    .Include(p => p.Customer)
-                    .Include(p => p.Rental)
                     .OrderByDescending(p => p.CreatedAt)
                     .ToListAsync();
             }
@@ -105,12 +99,13 @@ namespace MovieRental.Payment
         {
             try
             {
-                return await _movieRentalDb.Payments
-                    .Include(p => p.Customer)
-                    .Include(p => p.Rental)
+                var payments = await _movieRentalDb.Payments
                     .OrderByDescending(p => p.CreatedAt)
                     .ToListAsync();
+
+                return payments;
             }
+                
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving all payments");
@@ -124,8 +119,6 @@ namespace MovieRental.Payment
             {
                 return await _movieRentalDb.Payments
                     .Where(p => p.IsSuccessful)
-                    .Include(p => p.Customer)
-                    .Include(p => p.Rental)
                     .OrderByDescending(p => p.CreatedAt)
                     .ToListAsync();
             }
@@ -142,8 +135,6 @@ namespace MovieRental.Payment
             {
                 return await _movieRentalDb.Payments
                     .Where(p => !p.IsSuccessful)
-                    .Include(p => p.Customer)
-                    .Include(p => p.Rental)
                     .OrderByDescending(p => p.CreatedAt)
                     .ToListAsync();
             }

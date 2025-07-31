@@ -8,15 +8,11 @@ namespace MovieRental.Rental
 		[Key]
 		public int Id { get; set; }
 		public int DaysRented { get; set; }
-		public Movie.Movie? Movie { get; set; }
 
 		[ForeignKey("Movie")]
 		public int MovieId { get; set; }
 
 		public string PaymentMethod { get; set; } = string.Empty;
-
-		// Foreign key relationship to Customer
-		public Customer.Customer? Customer { get; set; }
 
 		[ForeignKey("Customer")]
 		public int CustomerId { get; set; }

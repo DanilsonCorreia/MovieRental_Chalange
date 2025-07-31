@@ -22,7 +22,7 @@ Can you help us fix some issues and implement missing features?
    Can you help us add a new entity for this? Don't forget to change the customer name field to a foreign key, and fix your previous method!
 
     New entity created for Customers with all need information, and creation of the service, the interface and controller for managing and adding the customers on the Db. 
-    Has changed the foreign key of customer for Id that is now used as identifier in the others methods and classes.
+    Has changed the foreign key of customerId  that is now used as identifier in the others methods and classes.
     
     
  * In the MovieFeatures class, there is a method to list all movies, tell us your opinion about it.
@@ -54,6 +54,7 @@ Here are the specific instructions for this implementation:
 
     Payment processing implemented on RentaFeature with support of new created PaymentFeature class to manage payments.
     As well i created a new entity for payment to store payment infos on Db.
+    The payment are done automatically and saved on db.
 
 * Payment Provider Designation:
     * The specific payment provider to be used in a rental is specified in the Rental model under the attribute named "PaymentMethod".

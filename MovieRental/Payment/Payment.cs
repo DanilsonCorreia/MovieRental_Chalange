@@ -23,19 +23,14 @@ namespace MovieRental.Payment
 
         public DateTime? ProcessedAt { get; set; }
 
-        // Foreign key relationship to Rental
-        public Rental.Rental? Rental { get; set; }
-
+        
         [ForeignKey("Rental")]
         public int? RentalId { get; set; }
 
-        // Foreign key relationship to Customer
-        public Customer.Customer? Customer { get; set; }
 
         [ForeignKey("Customer")]
         public int CustomerId { get; set; }
 
-        // Additional payment details
         public string? TransactionId { get; set; }
 
         public string? ProviderResponse { get; set; }
